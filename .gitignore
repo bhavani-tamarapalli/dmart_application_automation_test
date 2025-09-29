@@ -1,0 +1,15 @@
+```gitignore
+# Visual Studio cache & temp files
+.vs/
+*.user
+*.suo
+*.vsidx
+
+# Build output
+bin/
+obj/
+
+# Other common ignores
+*.log
+*.tmp
+
