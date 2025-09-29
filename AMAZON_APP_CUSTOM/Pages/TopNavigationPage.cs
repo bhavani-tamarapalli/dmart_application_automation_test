@@ -1,4 +1,59 @@
-﻿using Amazon_Application.Utilities;
+﻿//using Amazon_Application.Utilities;
+//using OpenQA.Selenium;
+//using OpenQA.Selenium.Interactions;
+
+//namespace Amazon_Application.Pages
+//{
+//    public class TopNavigationPage
+//    {
+//        private IWebDriver driver;
+
+//        public TopNavigationPage(IWebDriver driver)
+//        {
+//            this.driver = driver;
+//        }
+
+//        public void HoverAndClickTopNavItems()
+//        {
+//            Actions actions = new Actions(driver);
+
+
+//            IWebElement navParent = driver.FindElement(By.Id(ConfigReader.GetLocator("TopNavItemsParentId")));
+
+
+//            var navItems = navParent.FindElements(By.TagName("a"));
+
+//            for (int i = 0; i < navItems.Count; i++)
+//            {
+//                var item = navItems[i];
+//                string text = item.Text.Trim();
+
+//                if (string.IsNullOrEmpty(text)) continue;
+
+//                // Hover on nav item
+//                actions.MoveToElement(item).Perform();
+//                Console.WriteLine("Hovered on: " + text);
+
+//                Thread.Sleep(1000);
+
+//                item.Click();
+//                Console.WriteLine("Clicked on: " + text);
+
+//                Thread.Sleep(2000);
+
+
+//                driver.Navigate().Back();
+//                Thread.Sleep(2000);
+
+
+//                navParent = driver.FindElement(By.Id(ConfigReader.GetLocator("TopNavItemsParentId")));
+//                navItems = navParent.FindElements(By.TagName("a"));
+//            }
+//        }
+//    }
+//}
+
+using Amazon_Application.Utilities;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 
@@ -13,46 +68,39 @@ namespace Amazon_Application.Pages
             this.driver = driver;
         }
 
-        public void HoverAndClickTopNavItems()
+
+        public List<IWebElement> GetTopNavItems()
         {
-            Actions actions = new Actions(driver);
-
-           
             IWebElement navParent = driver.FindElement(By.Id(ConfigReader.GetLocator("TopNavItemsParentId")));
+            return navParent.FindElements(By.TagName("a")).ToList();
+        }
 
-         
-            var navItems = navParent.FindElements(By.TagName("a"));
 
-            for (int i = 0; i < navItems.Count; i++)
-            {
-                var item = navItems[i];
-                string text = item.Text.Trim();
+        public SubNavigationPage ClickTopNavItem(int index)
+        {
+            var navItems = GetTopNavItems();
 
-                if (string.IsNullOrEmpty(text)) continue;
+            if (index < 0 || index >= navItems.Count)
+                throw new ArgumentOutOfRangeException(nameof(index), "Invalid nav item index");
 
-                // Hover on nav item
-                actions.MoveToElement(item).Perform();
-                Console.WriteLine("Hovered on: " + text);
+            var item = navItems[index];
+            string text = item.Text.Trim();
 
-                Thread.Sleep(1000);
+            if (string.IsNullOrEmpty(text)) return null;
 
-                item.Click();
-                Console.WriteLine("Clicked on: " + text);
+            Actions actions = new Actions(driver);
+            actions.MoveToElement(item).Perform();
 
-                Thread.Sleep(2000);
+            Console.WriteLine("Hovered on: " + text);
 
-                
-                driver.Navigate().Back();
-                Thread.Sleep(2000);
+            item.Click();
+            Console.WriteLine("Clicked on: " + text);
 
-               
-                navParent = driver.FindElement(By.Id(ConfigReader.GetLocator("TopNavItemsParentId")));
-                navItems = navParent.FindElements(By.TagName("a"));
-            }
+            Thread.Sleep(2000);
+
+          
+            return new SubNavigationPage(driver);
         }
     }
-
-
-
-
 }
+
