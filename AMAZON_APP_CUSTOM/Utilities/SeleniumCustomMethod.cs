@@ -60,11 +60,8 @@
 
 
 
-
 using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
-using System;
 
 namespace Amazon_Application.Utilities
 {
@@ -88,7 +85,7 @@ namespace Amazon_Application.Utilities
 
             throw new Exception($"Unsupported locator: {locator}");
         }
-         public static IReadOnlyCollection<IWebElement> GetElements(IWebDriver driver, string locator, int timeoutInSeconds = 10)
+        public static IReadOnlyCollection<IWebElement> GetElements(IWebDriver driver, string locator, int timeoutInSeconds = 10)
         {
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds));
 
@@ -103,6 +100,6 @@ namespace Amazon_Application.Utilities
 
             throw new Exception($"Unsupported locator: {locator}");
         }
-      
+
     }
 }

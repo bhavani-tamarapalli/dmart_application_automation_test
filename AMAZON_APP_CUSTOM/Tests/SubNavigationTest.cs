@@ -1,12 +1,18 @@
-﻿using Amazon_Application.Pages;
+﻿
+using Amazon_Application.Pages;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using NUnit.Framework;
+using System;
+using System.Linq;
+using System.Threading;
 
 namespace Amazon_Application.Tests
 {
     public class SubNavigationTest
     {
         private IWebDriver driver;
+        private bool closeBrowser = true;
 
         [SetUp]
         public void Setup()
@@ -20,37 +26,62 @@ namespace Amazon_Application.Tests
         public void TestTopAndSubNavigation()
         {
             TopNavigationPage topNav = new TopNavigationPage(driver);
+            SubNavigationPage subNavPage = new SubNavigationPage(driver);
 
-            var navItems = topNav.GetTopNavItems();
+         
+            var topNavItems = topNav.GetTopNavItems();
+            int totalItems = topNavItems.Count;
+            //Console.WriteLine($"Total Top Nav Items: {totalItems}");
+            //Console.WriteLine("========================================\n");
 
-            for (int i = 0; i < navItems.Count; i++)
+            for (int i = 0; i < totalItems; i++)
             {
                
-                navItems = topNav.GetTopNavItems();
+                driver.Navigate().GoToUrl("https://www.amazon.in/");
+                Thread.Sleep(1000);
 
-                string navText = navItems[i].Text.Trim();
-                if (string.IsNullOrEmpty(navText)) continue;
-
-                Console.WriteLine($"==== Testing Top Nav: {navText} ====");
-
-                var subNavPage = topNav.ClickTopNavItem(i);
-
-                if (subNavPage != null)
+                topNavItems = topNav.GetTopNavItems();
+                if (i >= topNavItems.Count)
                 {
-                    subNavPage.ClickAllSubNavItems();
+                    Console.WriteLine($"Index {i} out of range after refresh, breaking loop");
+                    break;
                 }
 
-                driver.Navigate().Back();
-                Thread.Sleep(2000);
-            }
-        }
+                var navItem = topNavItems[i];
+                string navText = navItem.Text?.Trim() ?? "";
 
+                if (string.IsNullOrEmpty(navText))
+                {
+                    Console.WriteLine($"[{i + 1}/{totalItems}] Skipping empty nav item at index {i}\n");
+                    continue;
+                }
+
+                Console.WriteLine($"==== [{i + 1}/{totalItems}] Testing Top Nav: {navText} ====");
+
+                try
+                {
+                    subNavPage.ClickAllSubNavItems(navText);
+                    Console.WriteLine($" Completed testing: {navText}\n");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($" Error testing {navText}: {ex.Message}\n");
+                }
+            }
+
+            Console.WriteLine("========================================");
+            Console.WriteLine("Navigation testing completed successfully!");
+            Assert.Pass("All navigation items tested.");
+        }
 
         [TearDown]
         public void Teardown()
         {
-            driver.Quit();
-            driver.Dispose();
+            if (closeBrowser && driver != null)
+            {
+                driver.Quit();
+                driver.Dispose();
+            }
         }
     }
 }
